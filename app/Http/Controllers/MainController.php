@@ -1,34 +1,31 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Quiz;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
     public function index()
-    {
-        $data = [
-            [
-                "name" => "დავლაება - Blade",
-                "image" => "https://www.shutterstock.com/image-illustration/3d-red-number-300-isolated-260nw-1116771998.jpg",
-                "status" => 0
-            ],
-            [
-                "name" => "დავლაება - Blade",
-                "image" => "https://www.shutterstock.com/image-illustration/3d-red-number-300-isolated-260nw-1116771998.jpg",
-                "status" => 1
-            ],
-        ];
-        return view('home', compact('data'));
+{
+    $quizzes = Quiz::where('status', 1)
+        ->whereNotNull('image')
+        ->orderByDesc('create_date')
+        ->take(8)
+        ->get();
+
+    $remainingQuizzesCount = 8 - $quizzes->count();
+
+    if ($remainingQuizzesCount > 0) {
+        $additionalQuizzes = Quiz::where('status', 1)
+            ->where('description', '<>', '')
+            ->whereNotIn('id', $quizzes->pluck('id')->toArray())
+            ->take($remainingQuizzesCount)
+            ->get();
+
+        $quizzes = $quizzes->merge($additionalQuizzes);
     }
 
-    public function subscribe(Request $request)
-    {
-        // Handle subscription logic here
-        // $request->input('email') contains the subscribed email address
-
-        // Redirect back with a success message
-        return back()->with('success', 'Subscribed successfully!');
-    }
+    return view('home', compact('quizzes'));
+}
 }

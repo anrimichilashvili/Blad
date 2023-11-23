@@ -12,14 +12,17 @@ return new class extends Migration
      * @return void
      */
     public function up()
-{
-    Schema::create('quizzes', function (Blueprint $table) {
-        $table->id();
-        $table->string('title');
-        $table->text('description');
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('quizzes', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('description');
+            $table->string('status')->nullable(); // Adding the status field
+            $table->string('image')->nullable(); // Adding the image field
+            $table->date('create_date'); // Adding the create_date field
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.
@@ -31,3 +34,4 @@ return new class extends Migration
         Schema::dropIfExists('quizzes');
     }
 };
+
